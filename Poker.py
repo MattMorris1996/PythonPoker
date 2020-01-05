@@ -1,6 +1,7 @@
 import random
 
-#Class to handle Cards (Suit and Value)
+
+# Class to handle Cards (Suit and Value)
 class Card:
     def __init__(self, suit, val):
         self.suit = suit
@@ -15,98 +16,100 @@ class Card:
         else:
             print(self.faces[self.val - 9], self.suits[self.suit], end="")
 
-#Class to handle deck of cards
+
+# Class to handle deck of cards
 class Deck:
     def __init__(self):
         self.cards = []
         self.suits = ["diamonds", "hearts", "spades", "clubs"]
         self.faces = ["jack", "queen", "king", "ace"]
 
-        #Generate cards 13 cards in each of the 4 suits
+        # Generate cards 13 cards in each of the 4 suits
         for i in range(4):
             for j in range(13):
                 self.cards.append(Card(i, j))
 
     def print_all(self):
         for i, card in enumerate(self.cards):
-            #printing number cards
+            # printing number cards
             if card.val < 9:
                 print(card.val + 2, self.suits[card.suit])
-            #face card print "Jack" etc
+            # face card print "Jack" etc
             else:
                 print(self.faces[card.val - 9], self.suits[card.suit])
 
     def shuffle(self):
-        #shuffle cards by swapping two random cards
+        # shuffle cards by swapping two random cards
         for i in range(1000):
             a = random.randint(0, 51)
             b = random.randint(0, 51)
             self.cards[a], self.cards[b] = self.cards[b], self.cards[a]
 
-#Class to handle player
+
+# Class to handle player
 class Player:
     def __init__(self, chips, player_n):
-        #each player has id
+        # each player has id
         self.number = player_n
-        #number of chips
+        # number of chips
         self.chips = chips
-        #and a hand, list of cards
+        # and a hand, list of cards
         self.hand = []
 
     def deal(self, card):
-        #when player is dealt a card append to hand
+        # when player is dealt a card append to hand
         self.hand.append(card)
 
     def end(self):
-        #return hand to deck
+        # return hand to deck
         return [self.hand.pop(), self.hand.pop()]
 
     def connectivity(self, cards):
         output = []
         temp = []
         for each in range(len(cards)):
-            #print("")
-            for index in range(len(cards)-each):
+            # print("")
+            for index in range(len(cards) - each):
                 card = cards[each + index]
                 temp.append(card)
                 if each + index + 1 < len(cards):
                     next_card = cards[each + index + 1]
-                    #check connectivity
+                    # check connectivity
                     if card.val + 1 == next_card.val:
-                        #print(" ->", end="")
-                        print("",end="")
+                        # print(" ->", end="")
+                        print("", end="")
                     else:
-                        if len(temp) > 4 :
+                        if len(temp) > 4:
                             copy = temp.copy()
                             output.append(copy)
                         temp.clear()
                         break
         return output
-        #print("")
+        # print("")
 
     def duplicates(self, cards):
         output = []
         temp = []
         for each in range(len(cards)):
-            #print("")
-            for index in range(len(cards)-each):
+            # print("")
+            for index in range(len(cards) - each):
                 card = cards[each + index]
                 temp.append(card)
-                #card.print_card()
+                # card.print_card()
                 if each + index + 1 < len(cards):
                     next_card = cards[each + index + 1]
-                    #check connectivity
+                    # check connectivity
                     if card.val == next_card.val:
-                        #print("*", end=str(len(temp)))
-                        print("",end="")
+                        # print("*", end=str(len(temp)))
+                        print("", end="")
                     else:
-                        #print("", end=str(len(temp)))
-                        if len(temp) > 1 :
+                        # print("", end=str(len(temp)))
+                        if len(temp) > 1:
                             output.append(temp.copy())
                         temp = []
                         break
-        #print("")
-        #print("output",len(output))
+        # print("")
+        # print("output",len(output))
         return output
 
     def suitedness(self, cards):
@@ -125,8 +128,8 @@ class Player:
         for suit in suit_list:
             length = len(suit)
             if len(suit) >= 5:
-                for i in range(6-length):
-                    output.append(suit[i:i+5].copy())
+                for i in range(6 - length):
+                    output.append(suit[i:i + 5].copy())
             for card in suit:
                 card.print_card()
                 print(" *", end="")
@@ -136,7 +139,7 @@ class Player:
         return output;
 
     def score_hand(self, flop):
-        #using current cards of flop determine a 'score' to weight the strength of the hand
+        # using current cards of flop determine a 'score' to weight the strength of the hand
         all_cards = self.hand + flop
         all_cards.sort(key=lambda card: card.val)
         flushes = self.suitedness(all_cards)
@@ -153,7 +156,7 @@ class Player:
             print("")
 
         print("full house:")
-        for
+
         print("flushes:")
         for hands in flushes:
             print("hand: ")
@@ -177,7 +180,7 @@ class Player:
         print("")
 
 
-#Main class interacts with the Deck the flop and the players
+# Main class interacts with the Deck the flop and the players
 class Poker:
     def __init__(self, n_players, buy_in):
         self.players = []
@@ -207,7 +210,7 @@ class Poker:
         print("The Flop")
         for i in self.flop:
             i.print_card()
-            print(",",end="")
+            print(",", end="")
         print("")
 
     def score_hands(self):
