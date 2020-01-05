@@ -1,6 +1,5 @@
 import random
 
-
 # Class to handle Cards (Suit and Value)
 class Card:
     def __init__(self, suit, val):
