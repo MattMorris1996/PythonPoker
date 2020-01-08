@@ -1,6 +1,5 @@
 import random
 
-
 # Class to handle Cards (Suit and Value)
 class Card:
     def __init__(self, suit, val):
@@ -39,7 +38,7 @@ class Deck:
                 print(self.faces[card.val - 9], self.suits[card.suit])
 
     def shuffle(self):
-        # shuffle cards by swapping two random cards
+        #shuffle cards by swapping two random cards
         for i in range(1000):
             a = random.randint(0, 51)
             b = random.randint(0, 51)
