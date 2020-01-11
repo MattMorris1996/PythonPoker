@@ -1,0 +1,5 @@
+straight-flush,rank is sum
+four-of-kind, rank is highest card
+full-house, rank is highest three
+flush, rank is sum
+straight, rank is sum

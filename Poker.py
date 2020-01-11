@@ -1,5 +1,6 @@
 from PokerPlayers import *
 from CardDeck import *
+from PokerScoring import *
 
 # Main class interacts with the Deck the flop and the players
 class Poker:
@@ -38,15 +39,17 @@ class Poker:
         i = 0
         for player in self.players:
             print("player ", i)
-            player.score_hand(self.flop)
+            score_hand(self.flop, player.hand)
             i = i + 1
 
 
-PLAYERS = 10
-BUY_IN = 1000
+if __name__ == '__main__':
+    PLAYERS = 10
+    BUY_IN = 1000
 
-game = Poker(PLAYERS, BUY_IN)
-game.deal()
-game.print_hands()
-game.print_flop()
-game.score_hands()
+    game = Poker(PLAYERS, BUY_IN)
+    game.deal()
+    game.print_hands()
+    game.print_flop()
+    game.score_hands()
+

@@ -8,6 +8,10 @@ class Card:
         self.suits = ["diamonds", "hearts", "spades", "clubs"]
         self.faces = ["jack", "queen", "king", "ace"]
 
+    # two cards are the same if the value and the suit are the same
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     def print_card(self):
         print(" ", end="")
         if self.val < 9:
