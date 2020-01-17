@@ -86,7 +86,6 @@ def full_house(threes, twos):
 def two_pair(twos):
     output = []
     temp = []
-
     for two1 in twos:
         for two2 in twos:
             # prevent a two pairs of the same value combining to form a two pair
@@ -94,7 +93,6 @@ def two_pair(twos):
                 temp = two1 + two2
                 output.append(temp.copy())
                 temp = []
-
     return output
 
 
@@ -135,14 +133,26 @@ def connected_flushes(flushes, straights):
 
 def score_hand(flop, hand):
     # using current cards of flop determine a 'score' to weight the strength of the hand
+    out = []
+
     all_cards = hand + flop
     all_cards.sort(key=lambda card: card.val)
 
     all_duplicates = duplicates(all_cards)
+    flushes = same_suit(all_cards)
+    straights = connectivity(all_cards)
 
-    print(len(all_duplicates))
+    straight_flushes = connected_flushes(flushes, straights)
+    fours = four_kind(all_duplicates)
+    threes = three_kind(all_duplicates)
+    twos = pair(all_duplicates)
 
-    for hand in all_duplicates:
+    full_houses = full_house(threes, twos)
+    pairs = two_pair(twos)
+
+    out = twos + pairs + threes + straights + flushes + full_houses + fours + straight_flushes
+
+    for hand in out:
         for card in hand:
             card.print_card()
         print("")

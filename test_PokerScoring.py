@@ -67,6 +67,8 @@ class TestPokerHands(unittest.TestCase):
             self.assertEqual(5, len(hands))
 
     def test_two_pair(self):
+        two_pair = PokerScoring.two_pair(self.doubles)
+        self.assertEqual(2, len(two_pair))
 
     def test_straights(self):
         straights = PokerScoring.connectivity(self.straight_test)
@@ -83,9 +85,3 @@ class TestPokerHands(unittest.TestCase):
     def test_straight_flush(self):
         straight_flushes = PokerScoring.connected_flushes(self.flushes, self.straights)
         self.assertEqual(1, len(straight_flushes))
-
-    def test_four_kind(self):
-
-    def test_three_kind(self):
-
-    def test_pair(self):
