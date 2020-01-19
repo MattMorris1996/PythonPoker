@@ -40,7 +40,9 @@ class Poker:
         i = 0
         for player in self.players:
             print("player ", i)
-            score_hand(self.flop, player.hand)
+            player.score(self.flop)
+            player.get_strongest()
+            player.show_down()
             i = i + 1
 
 

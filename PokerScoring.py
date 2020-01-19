@@ -1,3 +1,74 @@
+from CardDeck import *
+
+class PokerScore:
+    def __init__(self):
+        self.flop = []
+        self.hand = []
+        self.straight_flushes = []
+        self.fours = []
+        self.full_houses = []
+        self.flushes = []
+        self.straights = []
+        self.threes = []
+        self.pairs = []
+        self.twos = []
+
+        self.strongest = []
+        self.strongest_type = ""
+        self.strongest_score = 0  # scoring function required future task quite complex
+
+    def score(self, flop, hand):
+        self.flop = flop
+        self.hand = hand
+        all_cards = hand + flop
+        all_cards.sort(key=lambda card: card.val)
+
+        all_duplicates = duplicates(all_cards)
+
+        self.flushes = same_suit(all_cards)
+        self.straights = connectivity(all_cards)
+
+        self.straight_flushes = connected_flushes(self.flushes, self.straights)
+        self.fours = four_kind(all_duplicates)
+        self.threes = three_kind(all_duplicates)
+        self.twos = pair(all_duplicates)
+
+        self.full_houses = full_house(self.threes, self.twos)
+        self.pairs = two_pair(self.twos)
+
+    def find_strongest(self):
+        # straight flushes
+        if self.straight_flushes.__len__() > 0:
+            self.strongest = self.straight_flushes[0]
+            self.strongest_type = "Straight Flush"
+        elif self.fours.__len__() > 0:
+            self.strongest = self.fours[0]
+            self.strongest_type = "Four Of A Kind"
+        elif self.full_houses.__len__() > 0:
+            self.strongest = self.full_houses[0]
+            self.strongest_type = "Full House"
+        elif self.flushes.__len__() > 0:
+            self.strongest = self.flushes[0]
+            self.strongest_type = "Flush"
+        elif self.straights.__len__() > 0:
+            self.strongest = self.straights[0]
+            self.strongest_type = "Straight"
+        elif self.threes.__len__() > 0:
+            self.strongest = self.threes[0]
+            self.strongest_type = "Three Of A Kind"
+        elif self.pairs.__len__() > 0:
+            self.strongest = self.pairs[0]
+            self.strongest_type = "Two Pair"
+        elif self.twos.__len__() > 0:
+            self.strongest = self.twos[0]
+            self.strongest_type = "Pair"
+
+    def print_strongest(self):
+        print(self.strongest_type)
+        for card in self.strongest:
+            card.print_card()
+
+
 def connectivity(cards):
     output = []
     temp = []
@@ -129,30 +200,3 @@ def connected_flushes(flushes, straights):
                 output.append(straight)
 
     return output
-
-
-def score_hand(flop, hand):
-    # using current cards of flop determine a 'score' to weight the strength of the hand
-    out = []
-
-    all_cards = hand + flop
-    all_cards.sort(key=lambda card: card.val)
-
-    all_duplicates = duplicates(all_cards)
-    flushes = same_suit(all_cards)
-    straights = connectivity(all_cards)
-
-    straight_flushes = connected_flushes(flushes, straights)
-    fours = four_kind(all_duplicates)
-    threes = three_kind(all_duplicates)
-    twos = pair(all_duplicates)
-
-    full_houses = full_house(threes, twos)
-    pairs = two_pair(twos)
-
-    out = twos + pairs + threes + straights + flushes + full_houses + fours + straight_flushes
-
-    for hand in out:
-        for card in hand:
-            card.print_card()
-        print("")
