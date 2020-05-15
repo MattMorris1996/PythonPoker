@@ -1,5 +1,6 @@
 from CardDeck import *
 
+
 class PokerScore:
     def __init__(self):
         self.flop = []
@@ -12,7 +13,7 @@ class PokerScore:
         self.threes = []
         self.pairs = []
         self.twos = []
-
+        self.all_cards = []
         self.strongest = []
         self.strongest_type = ""
         self.strongest_score = 0  # scoring function required future task quite complex
@@ -20,13 +21,13 @@ class PokerScore:
     def score(self, flop, hand):
         self.flop = flop
         self.hand = hand
-        all_cards = hand + flop
-        all_cards.sort(key=lambda card: card.val)
+        self.all_cards = hand + flop
+        self.all_cards.sort(key=lambda card: card.val)
 
-        all_duplicates = duplicates(all_cards)
+        all_duplicates = duplicates(self.all_cards)
 
-        self.flushes = same_suit(all_cards)
-        self.straights = connectivity(all_cards)
+        self.flushes = same_suit(self.all_cards)
+        self.straights = connectivity(self.all_cards)
 
         self.straight_flushes = connected_flushes(self.flushes, self.straights)
         self.fours = four_kind(all_duplicates)
@@ -62,6 +63,9 @@ class PokerScore:
         elif self.twos.__len__() > 0:
             self.strongest = self.twos[0]
             self.strongest_type = "Pair"
+        else:
+            self.strongest.append(self.all_cards[self.all_cards.__len__()-1])
+            self.strongest_type = "High Card"
 
     def print_strongest(self):
         print(self.strongest_type)
@@ -150,7 +154,6 @@ def full_house(threes, twos):
                 temp = three + two
                 output.append(temp.copy())
                 temp = []
-
     return output
 
 
