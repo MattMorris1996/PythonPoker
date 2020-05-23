@@ -26,7 +26,6 @@ class Poker:
         print(self.big_blind)
         self.players[(self.big_blind+2)%n_players].set_blind("dealer")
         self.players[(self.big_blind+1)%n_players].set_blind("small blind")
-        self.players[self.big_blind].set_blind("big blind")
 
     def deal(self):
         self.deck.shuffle()
@@ -62,7 +61,7 @@ class Poker:
             player.get_strongest()
             player.show_down()
 
-    def round_bet(self):
+    def round_bet(self, selection):
         for player in self.players:
             if selection == "fold":
                 self.deck.cards.append(player.end())
@@ -73,11 +72,12 @@ class Poker:
                 player.chips -= (self.call_amount + amount)
                 self.pot += self.call_amount+amount
             if selection == "call":
-
+                pass
             if selection == "raise":
+                pass
 
 if __name__ == '__main__':
-    PLAYERS = 7
+    PLAYERS = 8
     BUY_IN = 1000
 
     game = Poker(PLAYERS, BUY_IN)

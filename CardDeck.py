@@ -20,6 +20,15 @@ class Card:
         else:
             print(self.faces[self.val - 9], self.suits[self.suit], end="")
 
+    def image_path(self):
+        if self.val < 9:
+            return str(self.val + 2) + "_" + "of" + "_" + self.suits[self.suit]
+        else:
+            suffix = ""
+            if self.faces[self.val - 9] != "ace":
+                suffix = "2"
+            return self.faces[self.val - 9] + "_" + "of" + "_" + self.suits[self.suit]+suffix
+
 
 # Class to handle deck of cards
 class Deck:
