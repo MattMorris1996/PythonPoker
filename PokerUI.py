@@ -46,8 +46,7 @@ class UIPlayer:
         self.card_img_1 = UICard(100, player_obj.hand[0].image_path())
         self.card_img_2 = UICard(100, player_obj.hand[1].image_path())
 
-        self.bounding_surface = pygame.Surface((230, 300))
-        self.bounding_surface.fill((100, 150, 200))
+        self.bounding_surface = pygame.Surface((230, 300), pygame.SRCALPHA)
 
         self.player_name.display(115, 20, self.bounding_surface)
         self.player_chips.display(115, 50, self.bounding_surface)
@@ -63,17 +62,44 @@ class UIPlayer:
         return self.bounding_surface
 
 
+class UIButton:
+    def __init__(self, rect, text):
+        self.bounding_surface = pygame.Surface((rect.width, rect.height))
+        self.bounding_surface.fill((255, 0, 0))
+        self.button_name = UIText(text)
+        self.button_name.display(rect.width // 2, rect.height // 2, self.bounding_surface)
+
+
+    def get_surface(self):
+        return self.bounding_surface
+
+
 class UIPoker:
     def __init__(self, poker_obj, surface):
         self.players = poker_obj.players
         self.flop = poker_obj.flop
         self.surface_rect = surface.get_rect()
         self.n_players = len(self.players)
-        self.table_radius = 200
+        self.table_radius = 250
         self.player_ui_elements = []
+
+
         for i in range(self.n_players):
             player = self.players[i]
             self.player_ui_elements.append(UIPlayer(100, player))
+
+        self.button_check_rect = pygame.Rect(590, 520, 100, 50)
+        self.button_check = UIButton(self.button_check_rect, "Check")
+
+        self.button_raise_rect = pygame.Rect(590, 460, 100, 50)
+        self.button_raise = UIButton(self.button_raise_rect, "Raise")
+
+        self.button_call_rect = pygame.Rect(590, 580, 100, 50)
+        self.button_call = UIButton(self.button_call_rect, "Call")
+
+        self.button_fold_rect = pygame.Rect(590,640, 100, 50)
+        self.button_fold = UIButton(self.button_fold_rect, "Fold")
+
 
     def display(self):
         radians = math.pi / 180
@@ -88,8 +114,17 @@ class UIPoker:
         for i in range(self.n_players):
             x = int(self.table_radius * math.cos(sep_angle * i * radians))
             y = int(self.table_radius * math.sin(sep_angle * i * radians))
-            screen.blit(self.player_ui_elements[i].get_surface(),
-                        (x + width // 2 - ui_player_width // 2, y + height // 2 - ui_player_height // 2))
+            screen.blit(
+                self.player_ui_elements[i].get_surface(),
+                (
+                    x + width // 2 - ui_player_width // 2,
+                    y + height // 2 - ui_player_height // 2
+                )
+            )
+        screen.blit(self.button_fold.get_surface(), self.button_fold_rect)
+        screen.blit(self.button_call.get_surface(), self.button_call_rect)
+        screen.blit(self.button_raise.get_surface(), self.button_raise_rect)
+        screen.blit(self.button_check.get_surface(), self.button_check_rect)
 
     def flop_display(self):
         flop_images = []
