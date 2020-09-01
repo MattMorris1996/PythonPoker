@@ -2,8 +2,6 @@
 from math import factorial
 
 #Royal Flush
-
-
 def royal_flush_prob():
     number_outcomes = choose(52, 5)
     number_of_ways = 4

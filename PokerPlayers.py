@@ -1,10 +1,11 @@
-from PokerScoring import *
 import ScoreHand
 from CardDeck import *
 import itertools
+import random
 
 class Player:
-    def __init__(self, chips, player_n):
+    def __init__(self, chips, player_n, ai=0):
+        self.ai = ai
         # each player has id
         self.number = player_n
         # number of chips
@@ -12,11 +13,34 @@ class Player:
         # and a hand, list of cards
         self.hand = []
         # add a score for a hand
-        self.players_score = PokerScore()
 
         self.folded = False
 
         self.current_bet = 0
+
+        self.wins = 0
+        self.losses = 0
+
+    def ai_player(self, flop=[], pot_size=0, call_amount=0, check=False):
+        options = {1, 2}
+        if self.current_bet != call_amount:
+            options.add(3)
+        if check:
+            options.add(4)
+
+        selection = random.sample(options, 1)[0]
+        if selection == 1:
+            return ('fold',0)
+        if selection == 3:
+            delta = call_amount - self.current_bet
+            return ('call',delta)
+        if selection == 2:
+            delta = call_amount - self.current_bet
+            x = 50
+            return ('raise', int(x) + delta, self.current_bet + int(x) + delta)
+        if selection == 4:
+            return ('check',0)
+
 
     def console_ui(self, flop=[], pot_size=0, call_amount=0, check=False):
         print("|---------------------------------------------|")
@@ -68,7 +92,10 @@ class Player:
             return ('check',0)
 
     def turn(self, call_amount=0, check=False, flop=None, blind=0, pot_size=0): #Based on state of poker round, return desired turn
+        if self.ai == 0:
             return self.console_ui(flop=flop, pot_size=pot_size,call_amount=call_amount, check=check)
+        if self.ai == 1:
+            return self.ai_player(flop=flop, pot_size=pot_size, call_amount=call_amount, check=check)
 
     def bet(self, amount):
         if self.chips - amount < 0:

@@ -1,7 +1,7 @@
 from PokerPlayers import *
 from CardDeck import *
-from PokerScoring import *
 from random import *
+
 
 # Main class interacts with the Deck the flop and the players
 class Poker:
@@ -10,14 +10,14 @@ class Poker:
         self.number_players = n_players
 
         self.players = []
-        self.players_folded = set()
 
-        self.n_round = 0
+        self.players_active = set(list(range(self.number_players)))
+
         self.player_id_turn = 0
-        self.n_player_active = n_players
 
         self.blind = 10
         self.call_amount = self.blind
+
         self.pot = 0
         self.check_flag = False
 
@@ -25,57 +25,104 @@ class Poker:
         self.turn = []
         self.river = []
 
-        self.dealer_cards = self.flop + self.turn + self.river
-
         self.burn = []
 
         for i in range(n_players):
-            p = Player(buy_in, i)
+            p = Player(buy_in, i, ai=1)
             self.players.append(p)
 
         self.dealer_id = randint(0, self.number_players - 1)
-        self.dealer = self.players[self.dealer_id]
 
         self.big_blind_id = (self.dealer_id + 1) % self.number_players
         self.small_blind_id = (self.dealer_id + 2) % self.number_players
         self.lead_bet_id = self.big_blind_id
 
+    def GameInit(self):
+        # reset folded players
+        self.players_active = set(list(range(self.number_players)))
+
+        # move dealer one position
+        self.dealer_id = (1 + self.dealer_id) % self.number_players
+
+        # set blinds
+        self.big_blind_id = (self.dealer_id + 1) % self.number_players
+        self.small_blind_id = (self.dealer_id + 2) % self.number_players
+        self.lead_bet_id = self.big_blind_id
+
+        self.call_amount = self.blind
+
+        self.flop = []
+        self.turn = []
+        self.river = []
+
+        self.pot = 0
+        self.check_flag = False
+
     def Game(self):
         # Pre Flop
-        self.deal_hands()
-        self.round(round='start')
-        # Flop
-        self.deal_flop()
-        self.round()
-        # Turn
-        self.deal_turn()
-        self.round()
-        # River
-        self.deal_river()
-        self.round()
-        # The showdown
-        self.score_hands()
+        for i in range(10000):
+            self.GameInit()
+            self.deal_hands()
+            self.round(round='start')
+            # Flop
+            self.deal_flop()
+            self.round()
+            # Turn
+            self.deal_turn()
+            self.round()
+            # River
+            self.deal_river()
+            self.round()
+
+            # The showdown
+            winner = self.score_hands()
+            self.game_end(winner)
+
+        for p in self.players:
+            print("Player " + str(p.number) + " win rate:")
+            print(p.wins/(p.losses + p.wins))
+
+    def game_end(self, winning_player_id):
+        print("Player " + str(winning_player_id) + " Wins!")
+        player = self.players[winning_player_id]
+
+        for p in self.players:
+            if p.number == winning_player_id:
+                p.wins += 1
+            else:
+                p.losses += 1
+
+        player.chips += self.pot
+        self.pot = 0
+
+        for id in self.players_active:
+            self.deck.cards += self.players[id].fold()
+
+        self.deck.cards += self.flop + self.river + self.turn + self.burn
+
+        assert (len(self.deck.cards) == 52)
 
     def next_player(self):
         self.player_id_turn = (self.player_id_turn + 1) % self.number_players
-        while self.player_id_turn in self.players_folded:
+        while self.player_id_turn not in self.players_active:
             self.player_id_turn = (self.player_id_turn + 1) % self.number_players
 
     def round_init(self, pre_flop=False):
         if pre_flop:
             # pre flop take blinds and decide player 1
-            self.player_id_turn = self.big_blind_id
             self.players[self.big_blind_id].bet(self.blind)
             self.pot += self.blind
+
             self.players[self.small_blind_id].bet(self.blind // 2)
-            self.pot += self.blind//2
+            self.pot += self.blind // 2
+
             self.player_id_turn = (self.big_blind_id + 1) % self.number_players
             self.check_flag = False
         else:
             # set check flag and get first player id
             self.check_flag = True
             self.player_id_turn = (self.dealer_id + 1) % self.number_players
-            while self.player_id_turn in self.players_folded:
+            while self.player_id_turn not in self.players_active:
                 self.player_id_turn = (self.player_id_turn + 1) % self.number_players
             self.lead_bet_id = self.player_id_turn
 
@@ -86,6 +133,7 @@ class Poker:
             self.call_amount = option[2]
             self.players[self.player_id_turn].bet(amount)
             self.lead_bet_id = self.player_id_turn
+            self.pot += amount
             self.check_flag = False
         elif move == 'call':
             amount = option[1]
@@ -94,7 +142,7 @@ class Poker:
             self.check_flag = False
         elif move == 'fold':
             self.deck.cards += self.players[self.player_id_turn].fold()
-            self.players_folded.add(self.player_id_turn)
+            self.players_active.remove(self.player_id_turn)
             self.check_flag = False
         elif move == 'check':
             self.check_flag = True
@@ -114,6 +162,10 @@ class Poker:
             self.round_init(pre_flop=True)
 
             while 1:
+
+                if len(self.players_active) <= 1:
+                    print("all players folded")
+                    break
                 # player is told information about the current bet, player can raise or call if player raises he
                 # takes over as the lead bet and BB can no longer check to progress the round
 
@@ -144,6 +196,9 @@ class Poker:
             # lead bet id is the big blind
             self.round_init()
             while 1:
+                if len(self.players_active) <= 1:
+                    print("all players folded")
+                    break
                 # player is told information about the current bet, player can raise or call if player raises he takes over as the lead bet
                 # and BB can no longer check to progress the round
                 # if players have completed betting and lead bet is not big blind
@@ -152,7 +207,7 @@ class Poker:
                     check=self.check_flag,
                     call_amount=self.call_amount,
                     pot_size=self.pot,
-                    flop = self.flop + self.turn + self.river
+                    flop=self.flop + self.turn + self.river
                 )
 
                 # obtain move from option tuple
@@ -201,20 +256,16 @@ class Poker:
         print("")
 
     def score_hands(self):
-        i = 0
         winning_hand = ("Winning Hand", 0, None)
-        for player in self.players:
-            i = i + 1
-            score = player.score(self.flop + self.turn + self.river)
+        for p in self.players:
+            score = p.score(self.flop + self.turn + self.river)
             if score[1] > winning_hand[1]:
-                winning_hand = score, i - 1
-
-        print(winning_hand)
-
+                winning_hand = score + tuple([p.number])
+        return winning_hand[2]
 
 
 if __name__ == '__main__':
-    PLAYERS = 3
+    PLAYERS = 8
     BUY_IN = 1000
 
     game = Poker(PLAYERS, BUY_IN)
