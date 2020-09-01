@@ -196,7 +196,6 @@ def pair(all_duplicates):
 
 def connected_flushes(flushes, straights):
     output = []
-
     for flush in flushes:
         for straight in straights:
             if straight == flush:

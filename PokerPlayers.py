@@ -1,5 +1,7 @@
 from PokerScoring import *
+import ScoreHand
 from CardDeck import *
+import itertools
 
 class Player:
     def __init__(self, chips, player_n):
@@ -18,6 +20,7 @@ class Player:
 
     def console_ui(self, flop=[], pot_size=0, call_amount=0, check=False):
         print("|---------------------------------------------|")
+        print("Player " + str(self.number))
         print("Flop: ")
         print("     ", end="")
         for card in flop:
@@ -64,8 +67,6 @@ class Player:
         if selection == 4:
             return ('check',0)
 
-
-
     def turn(self, call_amount=0, check=False, flop=None, blind=0, pot_size=0): #Based on state of poker round, return desired turn
             return self.console_ui(flop=flop, pot_size=pot_size,call_amount=call_amount, check=check)
 
@@ -90,7 +91,13 @@ class Player:
         return [self.hand.pop(), self.hand.pop()]
 
     def score(self, flop):
-        self.players_score.score(flop, self.hand)
+        cards = map(lambda card:(card.val, card.suit), self.hand + flop)
+        highest = ("None", -1)
+        for hand in itertools.combinations(cards, 5):
+            score = ScoreHand.score_hand(hand)
+            if score[1] > highest[1]:
+                highest = score
+        return highest
 
     def get_strongest(self): #Find strongest hand
         self.players_score.find_strongest()

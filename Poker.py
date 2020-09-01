@@ -3,7 +3,6 @@ from CardDeck import *
 from PokerScoring import *
 from random import *
 
-
 # Main class interacts with the Deck the flop and the players
 class Poker:
     def __init__(self, n_players, buy_in):
@@ -203,13 +202,15 @@ class Poker:
 
     def score_hands(self):
         i = 0
+        winning_hand = ("Winning Hand", 0, None)
         for player in self.players:
             i = i + 1
-            print("")
-            print("Player: ", i)
-            player.score(self.flop + self.turn + self.river)
-            player.get_strongest()
-            player.show_down()
+            score = player.score(self.flop + self.turn + self.river)
+            if score[1] > winning_hand[1]:
+                winning_hand = score, i - 1
+
+        print(winning_hand)
+
 
 
 if __name__ == '__main__':
